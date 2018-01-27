@@ -51,6 +51,8 @@ int indexFileValueNum = 0;
 
 // declaration of program prototypes
 void showMenu();
+void mainFunction(int);
+void addNewRecord();
 
 
 // +++++++++++++++++++++++++ main part of program. +++++++++++++++++++
