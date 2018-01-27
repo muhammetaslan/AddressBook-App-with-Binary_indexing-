@@ -107,4 +107,215 @@ void showMenu(){
 
 }// end of the showMenu
 
+// All operation methods call by this function into the switch-case 
+void mainFunction(int actionOption){
+
+	// delete ,update function use this variable in searching
+	//this switch statement operate choing funtion
+	switch(actionOption){
+		
+		case 1:
+			// this part of switch adding funtion
+			printf(" \t##################### Adding New Record #####################\n");
+			changeFlagValue();
+			addNewRecord();
+			break;
+		
+		case 2:
+			// update operation accur there
+			printf("\n");
+			int checkValue1; 
+
+			checkValue1 = listForFunction();
+
+			if(checkValue1 == 1){
+
+				printf(" \t####################### Update Record ######################\n");
+				printf(" \n\tPlease don not use any SPACE and TURKISH characters in inputs\n");
+				// get the user nema and surname for primary value
+				char UpdName[20];
+				char UpdSurname[25];
+				printf("Please enter the name and surname that wantted to update\n");
+
+				printf("Name : ");
+				scanf("%s", UpdName);
+				
+				printf("Surname : ");
+				scanf("%s", UpdSurname);
+				//operation menu get key valu and user option
+				operationMenu(UpdName,UpdSurname,actionOption);
+			}//end of if	
+			break;
+		case 3:
+				// in case 3 user enter primary key value binary search alhorithm search user input in index file 
+				printf(" \t##################### Deleting Record ######################\n");
+				printf(" \n\tPlease don not use any SPACE and TURKISH characters in inputs\n");
+				
+				char DelName[20];
+				char DelSurname[25];
+			
+				printf("Please enter the name and surname that wantted to delete\n");
+				// get the user nema and surname for primary value
+				printf("Name : ");
+				scanf("%s", DelName);
+				
+				printf("Surname : ");
+				scanf("%s", DelSurname);
+				// call this function inside the opetation menu function run needed method
+
+				operationMenu(DelName,DelSurname,actionOption);
+
+			break;
+		case 4:
+			printf("\n");
+			int checkValue; 
+
+			checkValue = listForFunction();
+
+			if(checkValue == 1){
+				
+				printf(" \t#################### Find Record By Key ####################\n");
+				printf(" \n\tPlease don not use any SPACE and TURKISH characters in inputs\n");
+				printf("Please enter the name and surname for finding wantted record\n");
+				
+				char FindName[20];
+				char FindSurname[25];
+
+				printf("Name : ");
+				scanf("%s", FindName);
+				
+				printf("Surname : ");
+				scanf("%s", FindSurname);
+				// call this function inside the opetation menu function run needed method
+				operationMenu(FindName,FindSurname,actionOption);
+			}// end of if
+			break;
+		case 5:
+				printf(" \t#################### List Address Records ####################\n");
+				char listingCharacter;
+
+				printf("\nPlease enter first character for Listing match records : ");
+				scanf("\n%c",&listingCharacter);
+				// listingrecord function get the one character from user and then list matched value	
+				listingRecords(listingCharacter);
+			break;
+		case 6:
+				printf("Finishhh\n");	
+				// at the end of the program these two funtion write index array into index file
+				finalIndexMaker();
+				lastControlFlag();
+				printf("--->>>>>>>>>>>>>>>>>>> Closing The Address Book System <<<<<<<<<<<<<<<<<---\n");
+				exit(1);
+			break;
+		default:
+				// if the user enter invalid option program otamatically terminate there
+				printf("<!!!!!!!!!!!!!!!!!!!!!!> Please Choice Valid Option 1-6 <!!!!!!!!!!!!!!!!!!!!>\n");
+				exit(1);
+			break;			
+	}// end of switch
+
+}// end of mainFuntion method
+
+
+
+// this function add new item the data file binary type
+void addNewRecord(){
+
+	FILE* fp;
+	fp = fopen("AddressBook.dat", "ab");
+
+	int positionOfRecord=0;
+	
+	// controş the file exist or not giving directories.
+	if(!fp){
+		printf("!!!!! File not exists !!!!!\n");
+		return;
+	}//end of else	
+
+	AddressBook record;
+	int recordSize= 0;
+	int controlDublicate=0;
+
+	recordSize = findRecordNumber("AddressBook.dat");
+	// controş the file exist or not giving directories.
+	if(recordSize > 0){
+
+		firstItemCheck = 0;
+	
+	}else if(firstItemCheck == 0){
+
+		firstItemCheck = 1;
+	}// end of else
+
+	// get the address book informatiobn from user 
+	printf(" \n\n! Please don not use any SPACE and TURKISH characters in NAME AND SURNAME INPUTS !");
+	printf(" \n! SPACE CHARACTER IS ALLOWED FOR ADDRESS AND NOTES INPUTS  !\n");
+	positionOfRecord = ftell(fp);
+	printf("\nPosition of record in record file : %d\n\n",positionOfRecord);
+
+	printf("Please enter name :");
+	scanf("%s", record.name);
+	// user enter name value and at the same time this value assing into index array 
+	strcpy(addressContainer.index1[indexFileValueNum].primaryKeyName,record.name) ;
+			
+
+	printf("Please enter surname :");	
+	scanf("%s", record.surname);
+	// user enter surname value and at the same time this value assing into index array 
+	strcpy(addressContainer.index1[indexFileValueNum].primaryKeySurname,record.surname) ;
+	
+	addressContainer.index1[indexFileValueNum].indexNum = indexFileValueNum * 146;
+
+
+	qsort(addressContainer.index1, indexFileValueNum, sizeof(AddressIndex), compareLetter);
+
+	indexFileValueNum++;
+	// controlDublicateValue return 0 or 1 according to dublicate values enterence
+	controlDublicate = controlDublicateValue(record.name,record.surname,recordSize);
+
+	// thsi if statement control the input values of name and surname is exist or not in the index file 
+	// prevent dublicate enterence	
+	if(controlDublicate || firstItemCheck ){
+	
+		printf("Please enter address :");
+		// scanf function do nat aloe spacae character so program use fgets functoin there 
+		int inputCounter1=0;
+		while(fgets(record.address,sizeof(record.address),stdin) ){
+
+			if(inputCounter1 == 1){
+				break;
+			}// end of if
+			inputCounter1++;
+			
+		}//end of while
+		
+
+		printf("Please enter additionNotes :");
+		// scanf function do nat aloe spacae character so program use fgets functoin there 
+		int inputCounter=0;
+		while(fgets(record.additionNotes,sizeof(record.additionNotes),stdin) ){
+
+			if(inputCounter == 0){
+				break;
+			}
+			inputCounter++;
+					
+		}//end of while
+		
+
+		record.removingFlag = '*';
+		
+		fseek(fp, 0, SEEK_SET);
+	
+
+		firstItemCheck = 0;
+		// write the data into record file.
+		fwrite(&record, sizeof(AddressBook),1,fp);
+	
+	}// end of else*/
+	
+	fclose(fp);
+
+} // end of addNewRecord
+
 
