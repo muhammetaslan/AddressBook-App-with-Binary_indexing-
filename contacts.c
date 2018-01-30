@@ -53,6 +53,7 @@ int indexFileValueNum = 0;
 void showMenu();
 void mainFunction(int);
 void addNewRecord();
+int listingRecords(char);
 
 
 // +++++++++++++++++++++++++ main part of program. +++++++++++++++++++
@@ -406,5 +407,65 @@ int controlDublicateValue(char name[],char surname[],int size){
 	
 	return 1;
 }// end of controlDublicate
+
+// findAddressRecordByPrimaryKey get seaching sturuct with the AddressINdex struct value reach indexNum of record file 
+void findAddressRecordByPrimaryKey(int ADDRESSMAIN,char name[],char surname[]){
+	// declarition of reading file
+	FILE* inputFile;
+    inputFile = fopen("AddressBook.dat","rb");
+
+    AddressBook bufferRecord;
+	
+	//  SearchAddress.addressData.index num give record file address which one wantted for finding
+	
+	fseek(inputFile, ADDRESSMAIN, SEEK_SET);
+	fread(&bufferRecord,sizeof(AddressBook),1,inputFile);
+	printf("\n\nYour find value is found by primary key value");
+	printf("\nname is %s, surname is %s, address is:%s  , Additionnotes : %s \n", bufferRecord.name, bufferRecord.surname, bufferRecord.address,bufferRecord.additionNotes);
+
+  	fclose(inputFile);
+}// end of findAddressRecordByPrimaryKey()
+
+
+// this function inside the opetation menu function run needed method
+void operationMenu(char name[],char surname[],int option){
+
+	// searchArray return address of index into realted array value
+	int searchAddress = searchArray(name,surname);
+
+
+	if(searchAddress != 9999){
+			
+			// according to option this switch statement direct program.
+			switch(option){
+				
+				case 2:
+					// change index file flag value 1 - 0
+					changeFlagValue();
+					//updateRecordByPrimaryKey function get the searching address result then use this value updating index 
+					updateRecordByPrimaryKey(searchAddress);
+				break;
+				
+				case 3:
+					// change index file flag value 1 - 0
+					changeFlagValue();
+					//Delete function get result valure for deleting operation
+					deleteAdressByPrimaryKey(searchAddress);
+				break;
+				
+				case 4:
+					// change index file flag value 1 - 0
+					changeFlagValue();
+					// find value with primary key value 
+					findAddressRecordByPrimaryKey(searchAddress,name,surname);
+				break;
+				
+				case 5:
+
+				break;
+			}// end of switch
+	
+	}	
+}// end of operationMenu
 
 
