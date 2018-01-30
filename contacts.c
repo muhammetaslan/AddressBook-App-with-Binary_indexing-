@@ -320,4 +320,91 @@ void addNewRecord(){
 
 } // end of addNewRecord
 
+// this function get fist character of primarykey value then seach in the index Array into RAM 
+//if find the matches values send to address of record file read by this address finally print record on the screen 
+int listingRecords(char fistCharacter)
+{
+	
+	FILE* recordFile;
+    // opn the AddressBook.dat file for reading records
+    recordFile = fopen("AddressBook.dat","rb");
+	
+	int controlListing = 0 ; 
+	int positionOfRecord = 0 ; 
+	char tempString[20];
+
+	AddressBook bufferRecord;
+	// change the program flag value
+	changeFlagValue();	
+	positionOfRecord = findRecordNumber("AddressBook.dat");
+	printf("%d\n",positionOfRecord );
+	
+	// this for loop list the matched elements
+	int i;
+	for(i = 0 ; i < (positionOfRecord/146) ; i++){
+
+		strcpy(tempString,addressContainer.index1[i].primaryKeyName);	
+		
+		if(  tempString[0] == fistCharacter ){
+			// fseek function always go to next value of amount array indexNum 
+			fseek(recordFile,addressContainer.index1[i].indexNum , SEEK_SET);	
+					
+			fread(&bufferRecord,sizeof(AddressBook),1,recordFile);
+			// this printf print the screen record value
+			printf("\n%s %s, address is:%s  , Addition Notes : %s\n", bufferRecord.name, bufferRecord.surname, bufferRecord.address,bufferRecord.additionNotes);
+			controlListing = 1;
+		}// end of if
+
+	}// end of for loop
+	
+	// if any values do not match input character retrun error message 
+	if(controlListing == 0){
+		printf("\n!!! Your input character does not match any primary Key value firts character !!\n");
+		return 0;
+	}//end of if
+
+	return 1;
+	fclose(recordFile);
+}// end of listingRecords
+
+
+// findRecordNumber function find number of record using with ftell() ; 
+int findRecordNumber(char *AddressBk){
+
+	FILE *record_fp1;
+
+	int positionOfRecord=0;
+
+	// this statement return value of record address 
+	record_fp1 = fopen(AddressBk,"ab");
+	positionOfRecord = ftell(record_fp1);
+
+	return positionOfRecord;
+}// end of findRecordNumber 
+
+
+// this funtion compare to first character of string in the qsort();
+int compareLetter(const void* a, const void* b){
+	return (strcmp(((AddressIndex*)a)->primaryKeyName, ((AddressIndex*)b)->primaryKeyName));
+}//end of compareLetter
+
+
+
+// this function control the in enternece in data is dublicate or not 
+int controlDublicateValue(char name[],char surname[],int size){
+
+	int i;
+	for(i = 0 ; i < (size/146) ; i++){
+		
+		if(strcmp(addressContainer.index1[i].primaryKeyName,name) == 0 && strcmp(addressContainer.index1[i].primaryKeySurname,surname) == 0 ){
+
+			printf("Your input %s %s is using others users Please enter diffrent key value\n",name,surname);
+			return 0;
+			break;
+		}//end of if
+	}// end of for
+	
+	return 1;
+}// end of controlDublicate
+
 
